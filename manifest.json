@@ -1,0 +1,9 @@
+{
+  "format": "QIFURS01",
+  "run_id": "42851105750",
+  "success": false,
+  "encrypted_bytes": 16985,
+  "encrypted_sha256": "c3bc13e3ad960b9a8437a96a53f8a0cfd1f49bae8215c4da97de275662e06d79",
+  "application_source_public": false,
+  "plaintext_logs_public": false
+}
