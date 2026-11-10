@@ -1,0 +1,32 @@
+name: Confidential iOS build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: confidential-ios-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    env:
+      CONFIDENTIAL_IOS_KEY: ${{ secrets.CONFIDENTIAL_IOS_KEY }}
+    steps:
+      - name: Fetch generic build infrastructure
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Prepare isolated encryption environment
+        run: |
+          python3 -m venv "$RUNNER_TEMP/ios-ci-python"
+          "$RUNNER_TEMP/ios-ci-python/bin/pip" -q install cryptography
+      - name: Archive and export without App Store upload
+        run: '"$RUNNER_TEMP/ios-ci-python/bin/python" scripts/confidential_mac_build.py build'
+      - name: Return encrypted result without artifact-storage upload
+        if: always()
+        env:
+          RESULT_GITHUB_TOKEN: ${{ github.token }}
+        run: '"$RUNNER_TEMP/ios-ci-python/bin/python" scripts/confidential_mac_build.py publish'
